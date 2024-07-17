@@ -2,6 +2,7 @@
 
 namespace Papara.Data.Domain
 {
+	// Id ve IsActive => BaseEntity
 	public class CustomerDetail : BaseEntity
 	{
 		public long CustomerId { get; set; }

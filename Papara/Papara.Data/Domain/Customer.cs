@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Papara.Data.Domain
 {
+	// Id ve IsActive => BaseEntity
 	public class Customer : BaseEntity
 	{
 		public string FirstName { get; set; }
