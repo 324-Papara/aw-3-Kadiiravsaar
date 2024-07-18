@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Papara.Business.Validations
 {
+	
 	public class CustomerRequestValidator : AbstractValidator<CustomerRequest>
 	{
 		public CustomerRequestValidator()
@@ -33,4 +34,5 @@ namespace Papara.Business.Validations
 				.NotEmpty().WithMessage("Date of birth is required");
 		}
 	}
+
 }
