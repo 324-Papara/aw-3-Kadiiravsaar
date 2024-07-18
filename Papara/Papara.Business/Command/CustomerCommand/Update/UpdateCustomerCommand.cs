@@ -1,14 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
 using Papara.Base.Response;
-using Papara.Data.Domain;
 using Papara.Data.UnitOfWork;
 using Papara.Schema.CustomerSchema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Papara.Business.Command.CustomerCommand.Update
 {

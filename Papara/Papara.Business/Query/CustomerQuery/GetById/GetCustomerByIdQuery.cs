@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Papara.Base.Response;
 using Papara.Data.UnitOfWork;
+using Papara.Schema.CustomerDetailSchema;
 using Papara.Schema.CustomerSchema;
 
 namespace Papara.Business.Query.CustomerQuery.GetById
@@ -27,6 +28,15 @@ namespace Papara.Business.Query.CustomerQuery.GetById
 			var entity = await _unitOfWork.CustomerRepository.GetInclude(
 				request.CustomerId,
 				include:c=>c.Include(c=>c.CustomerDetail));
+
+			if (entity == null)
+			{
+				return new ApiResponse<CustomerResponse>(false)
+				{
+					IsSuccess = false,
+					Message = "Customer not found"
+				};
+			}
 
 			var mapped = _mapper.Map<CustomerResponse>(entity);
 			return new ApiResponse<CustomerResponse>(mapped);
