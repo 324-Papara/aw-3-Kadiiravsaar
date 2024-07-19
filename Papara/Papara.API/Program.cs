@@ -1,17 +1,19 @@
 
-using AutoMapper;
+using Autofac.Extensions.DependencyInjection;
+using Autofac;
+
 using FluentValidation.AspNetCore;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
+
 using Papara.API.Middleware;
-using Papara.API.ServiceTest;
-using Papara.Business.Command.CustomerCommand.Create;
-using Papara.Business.Mapping;
+
 using Papara.Business.Validations;
-using Papara.Data.Context;
-using Papara.Data.UnitOfWork;
-using System.Reflection;
+
+using Swashbuckle.AspNetCore.SwaggerUI;
+
 using System.Text.Json.Serialization;
+using Papara.API.Modules;
+using Microsoft.AspNetCore.Mvc;
+using Papara.API.Filters;
 
 namespace Papara.API
 {
@@ -23,37 +25,30 @@ namespace Papara.API
 
 			// Add services to the container.
 
-			builder.Services.AddControllers()
-				.AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<CustomerRequestValidator>())
+			builder.Services.AddControllers(options => options.Filters.Add(new ValidateFilterAttribute()))
+				.AddFluentValidation(fv => { fv.RegisterValidatorsFromAssemblyContaining<CustomerRequestValidator>(); fv.DisableDataAnnotationsValidation = true; } )
 				.AddJsonOptions(options =>
 			{
 				options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 				options.JsonSerializerOptions.WriteIndented = true;
 				options.JsonSerializerOptions.PropertyNamingPolicy = null;
-			}); ;
+			});
+
+			builder.Services.Configure<ApiBehaviorOptions>(options =>
+			{
+				options.SuppressModelStateInvalidFilter = true;
+
+			});
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 
-			string connectionStringMsSql = builder.Configuration.GetConnectionString("MsSqlConnection");
-			builder.Services.AddDbContext<PaparaDbContext>(x => x.UseSqlServer(connectionStringMsSql));
 
-
-			builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
-			var config = new MapperConfiguration(cfg =>
+			builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory()); // Bu satýr, uygulamanýn varsayýlan hizmet saðlayýcý fabrikasýný Autofac ile deðiþtirmek için kullanýlýr.
+			builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 			{
-				cfg.AddProfile(new MapperConfig());
+				containerBuilder.RegisterModule(new AutofacModule(builder.Configuration));
 			});
-
-			builder.Services.AddSingleton(config.CreateMapper());
-
-			builder.Services.AddMediatR(typeof(CreateCustomerCommand).GetTypeInfo().Assembly);
-
-
-			builder.Services.AddTransient<CustomService>();
-			builder.Services.AddScoped<CustomService2>();
-			builder.Services.AddSingleton<CustomService3>();
 
 			var app = builder.Build();
 
@@ -61,56 +56,18 @@ namespace Papara.API
 			if (app.Environment.IsDevelopment())
 			{
 				app.UseSwagger();
-				app.UseSwaggerUI();
+				app.UseSwaggerUI(opt =>
+				{
+					opt.DocExpansion(DocExpansion.None);
+				});
 			}
 
-
-			app.UseMiddleware<HeartbeatMiddleware>();
 			app.UseMiddleware<ErrorHandlerMiddleware>();
-
+			app.UseMiddleware<LoggerMiddleware>();
+			app.UseMiddleware<HeartbeatMiddleware>();
 			app.UseHttpsRedirection();
-
 			app.UseAuthorization();
-
-
 			app.MapControllers();
-
-
-			//app.Use((context, next) =>
-			//{
-			//	if (!string.IsNullOrEmpty(context.Request.Path) && context.Request.Path.Value.Contains("favicon"))
-			//	{
-			//		return next();
-			//	}
-
-			//	var service1 = context.RequestServices.GetRequiredService<CustomService>();
-			//	var service2 = context.RequestServices.GetRequiredService<CustomService2>();
-			//	var service3 = context.RequestServices.GetRequiredService<CustomService3>();
-
-			//	service1.Counter++;
-			//	service2.Counter++;
-			//	service3.Counter++;
-
-			//	return next();
-			//});
-
-			//app.Run(async context =>
-			//{
-			//	var service1 = context.RequestServices.GetRequiredService<CustomService>();
-			//	var service2 = context.RequestServices.GetRequiredService<CustomService2>();
-			//	var service3 = context.RequestServices.GetRequiredService<CustomService3>();
-
-			//	if (!string.IsNullOrEmpty(context.Request.Path) && !context.Request.Path.Value.Contains("favicon"))
-			//	{
-			//		service1.Counter++;
-			//		service2.Counter++;
-			//		service3.Counter++;
-			//	}
-
-			//	await context.Response.WriteAsync($"Service1 : {service1.Counter}\n");
-			//	await context.Response.WriteAsync($"Service2 : {service2.Counter}\n");
-			//	await context.Response.WriteAsync($"Service3 : {service3.Counter}\n");
-			//});
 
 			app.Run();
 
