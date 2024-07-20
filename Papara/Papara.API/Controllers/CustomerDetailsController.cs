@@ -7,6 +7,7 @@ using Papara.Business.Command.CustomerDetailCommand.Delete;
 using Papara.Business.Command.CustomerDetailCommand.Update;
 using Papara.Business.Query.CustomerDetailQuery.GetById;
 using Papara.Business.Query.CustomerDetailQuery.GetList;
+using Papara.Business.Query.CustomerDetailQuery.GetListWithInclude;
 using Papara.Schema.CustomerDetailSchema;
 
 namespace Papara.API.Controllers
@@ -23,16 +24,25 @@ namespace Papara.API.Controllers
 		}
 
 
-		[HttpGet]
-		public async Task<ApiResponse<List<CustomerDetailResponse>>> Get()
+		[HttpGet("GetListWithInclude")]
+		public async Task<ApiResponse<List<CustomerDetailResponseWithInclude>>> GetListCustomerDetailsInclude()
 		{
-			var operation = new GetAllCustomerDetailQuery();
+			var operation = new GetListCustomerDetailsWithIncludeQuery();
+			var result = await _mediator.Send(operation);
+			return result;
+		}
+
+
+		[HttpGet("GetListCustomerDetails")]
+		public async Task<ApiResponse<List<CustomerDetailResponse>>> GetListCustomerDetails()
+		{
+			var operation = new GetListCustomerDetailsQuery();
 			var result = await _mediator.Send(operation);
 			return result;
 		}
 
 		[HttpGet("{customerDetailId}")]
-		public async Task<ApiResponse<CustomerDetailResponse>> Get([FromRoute] long customerDetailId)
+		public async Task<ApiResponse<CustomerDetailResponseWithInclude>> Get([FromRoute] long customerDetailId)
 		{
 			var operation = new GetCustomerDetailByIdQuery(customerDetailId);
 			var result = await _mediator.Send(operation);

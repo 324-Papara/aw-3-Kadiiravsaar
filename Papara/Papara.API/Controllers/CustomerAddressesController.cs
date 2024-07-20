@@ -1,19 +1,14 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Papara.Base.Response;
 using Papara.Business.Command.CustomerAddressCommand.Create;
 using Papara.Business.Command.CustomerAddressCommand.Delete;
 using Papara.Business.Command.CustomerAddressCommand.Update;
-using Papara.Business.Command.CustomerCommand.Create;
-using Papara.Business.Command.CustomerCommand.Delete;
 using Papara.Business.Query.CustomerAddressQuery.GetById;
 using Papara.Business.Query.CustomerAddressQuery.GetList;
-using Papara.Business.Query.CustomerQuery.GetById;
-using Papara.Business.Query.CustomerQuery.GetList;
-using Papara.Business.Query.CustomerQuery.GetParameterQuery;
+using Papara.Business.Query.CustomerAddressQuery.GetListWithInclude;
 using Papara.Schema.CustomerAddressSchema;
-using Papara.Schema.CustomerSchema;
+
 
 namespace Papara.API.Controllers
 {
@@ -29,10 +24,20 @@ namespace Papara.API.Controllers
 		}
 
 
-		[HttpGet]
-		public async Task<ApiResponse<List<CustomerAddressResponse>>> Get()
+		[HttpGet("GetListWithDetail")]
+
+		public async Task<ApiResponse<List<CustomerAddressResponseWithDetail>>> GetListCustomerAddressesWithDetail()
 		{
-			var operation = new GetAllCustomerAddressQuery();
+			var operation = new GetListCustomerAddressesWithDetailQuery();
+			var result = await _mediator.Send(operation);
+			return result;
+		}
+
+		[HttpGet("GetList")]
+
+		public async Task<ApiResponse<List<CustomerAddressResponse>>> GetListCustomerAddresses()
+		{
+			var operation = new GetListCustomerAddressesQuery();
 			var result = await _mediator.Send(operation);
 			return result;
 		}

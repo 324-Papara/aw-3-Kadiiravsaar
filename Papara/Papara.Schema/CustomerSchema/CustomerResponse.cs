@@ -1,6 +1,4 @@
 ﻿using Papara.Base.Schema;
-using Papara.Data.Domain;
-using Papara.Schema.CustomerDetailSchema;
 
 namespace Papara.Schema.CustomerSchema
 {
@@ -12,7 +10,6 @@ namespace Papara.Schema.CustomerSchema
 		public string Email { get; set; }
 		public int CustomerNumber { get; set; }
 		public DateTime DateOfBirth { get; set; }
-		public virtual CustomerDetailResponse CustomerDetail { get; set; }
 
 	}
 }

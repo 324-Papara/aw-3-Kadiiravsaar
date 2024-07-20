@@ -31,7 +31,7 @@ namespace Papara.Business.Query.CustomerQuery.GetById
 
 			if (entity == null)
 			{
-				return new ApiResponse<CustomerResponse>(false)
+				return new ApiResponse<CustomerResponse>()
 				{
 					IsSuccess = false,
 					Message = "Customer not found"

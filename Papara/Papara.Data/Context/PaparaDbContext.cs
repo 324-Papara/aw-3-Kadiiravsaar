@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Papara.Data.Configuration;
 using Papara.Data.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Papara.Data.Context
 {
@@ -20,6 +15,7 @@ namespace Papara.Data.Context
 		public DbSet<Customer> Customers { get; set; }
 		public DbSet<CustomerAddress> CustomerAddresses { get; set; }
 		public DbSet<CustomerPhone> CustomerPhones { get; set; }
+		public DbSet<CustomerDetail> CustomerDetails { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

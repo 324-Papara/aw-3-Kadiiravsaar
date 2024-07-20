@@ -1,12 +1,11 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Papara.Base.Response;
 using Papara.Business.Command.CustomerCommand.Create;
 using Papara.Business.Command.CustomerCommand.Delete;
 using Papara.Business.Command.CustomerCommand.Update;
 using Papara.Business.Query.CustomerQuery.GetById;
-using Papara.Business.Query.CustomerQuery.GetList;
+using Papara.Business.Query.CustomerQuery.GetListWithInclude;
 using Papara.Business.Query.CustomerQuery.GetParameterQuery;
 using Papara.Schema.CustomerSchema;
 
@@ -22,12 +21,20 @@ namespace Papara.API.Controllers
 		{
 			_mediator = mediator;
 		}
+			
 
-
-		[HttpGet]
-		public async Task<ApiResponse<List<CustomerResponse>>> Get()
+		[HttpGet("GetListWithDetail")]
+		public async Task<ApiResponse<List<CustomerResponseWithDetail>>> GetListCustomersWithDetail()
 		{
-			var operation = new GetAllCustomerQuery();
+			var operation = new GetListCustomersWithDetailQuery();
+			var result = await _mediator.Send(operation);
+			return result;
+		}
+
+		[HttpGet("GetList")]
+		public async Task<ApiResponse<List<CustomerResponse>>> GetListCustomers()
+		{
+			var operation = new GetListCustomersQuery();
 			var result = await _mediator.Send(operation);
 			return result;
 		}
@@ -49,7 +56,7 @@ namespace Papara.API.Controllers
 			return result;
 		}
 
-		[HttpPost]
+		[HttpPost]	
 		public async Task<ApiResponse<CustomerResponse>> Post([FromBody] CustomerRequest value)
 		{
 			var operation = new CreateCustomerCommand(value);

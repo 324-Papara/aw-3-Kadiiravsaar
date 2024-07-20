@@ -60,7 +60,7 @@ namespace Papara.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerDetail",
+                name: "CustomerDetails",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -77,9 +77,9 @@ namespace Papara.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerDetail", x => x.Id);
+                    table.PrimaryKey("PK_CustomerDetails", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CustomerDetail_Customers_CustomerId",
+                        name: "FK_CustomerDetails_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "Id",
@@ -117,8 +117,8 @@ namespace Papara.Data.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerDetail_CustomerId",
-                table: "CustomerDetail",
+                name: "IX_CustomerDetails_CustomerId",
+                table: "CustomerDetails",
                 column: "CustomerId",
                 unique: true);
 
@@ -159,7 +159,7 @@ namespace Papara.Data.Migrations
                 name: "CustomerAddresses");
 
             migrationBuilder.DropTable(
-                name: "CustomerDetail");
+                name: "CustomerDetails");
 
             migrationBuilder.DropTable(
                 name: "CustomerPhones");

@@ -2,12 +2,8 @@
 using Microsoft.EntityFrameworkCore.Query;
 using Papara.Base.Entity;
 using Papara.Data.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Papara.Data.GenericRepository
 {
@@ -15,55 +11,60 @@ namespace Papara.Data.GenericRepository
 	{
 		private readonly PaparaDbContext dbContext;
 
-
 		public GenericRepository(PaparaDbContext dbContext)
 		{
 			this.dbContext = dbContext;
 		}
 
-
-		/// <summary>
-		/// Ödev 2 
-		/// </summary>
-		/// <returns></returns>
-	
 		public IQueryable<TEntity> Query() => dbContext.Set<TEntity>();
 
+		/// <summary>
+		/// Bu metot isterse include işlemi ile yapılabilir ve sadece isactive alanı true olanaları getirr
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="include"></param>
+		/// <returns></returns>
 		public async Task<TEntity> GetInclude(long id,
 		   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
 		{
-
-			IQueryable<TEntity> queryable = Query();
+			IQueryable<TEntity> queryable = Query().Where(x => x.IsActive);
 
 			if (include != null)
 				queryable = include(queryable);
 
 			var entity = await queryable.FirstOrDefaultAsync(x => x.Id == id);
 
-			if (entity == null)
-			{
-				throw new Exception("Entity not found");
-			}
-
 			return entity;
 		}
 
-		public async Task<List<TEntity>> GetAllInclude(Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
+
+		// bu işlemde istersem include yaparım istersem predicate kullanırım fakat istemezsem doğrudan getAllInclude çağırıp da kullanabilirim
+		// eğer include ve predicate null geçersem GetAll ile aynı işlemi yapabilirim tek farku Where(x => x.IsActive) olur 
+		public async Task<List<TEntity>> GetAllInclude(
+	   Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
+	   Expression<Func<TEntity, bool>>? predicate = null)
 		{
 			IQueryable<TEntity> queryable = Query();
+
+			if (predicate != null)
+				queryable = queryable.Where(predicate);
 
 			if (include != null)
 				queryable = include(queryable);
 
-
-
 			return await queryable.ToListAsync();
 		}
 
+		/// <summary>
+		/// parametre olarak sorgulamak için mesela name alanına göre getirmek istersek
+		/// </summary>
+		/// <param name="filter"></param>
+		/// <returns></returns>
 		public async Task<List<TEntity>> Where(Expression<Func<TEntity, bool>> filter)
 		{
-			return await dbContext.Set<TEntity>().Where(filter).ToListAsync();
+			return await Query().Where(filter).ToListAsync();
 		}
+
 		public async Task Save()
 		{
 			await dbContext.SaveChangesAsync();
@@ -71,7 +72,11 @@ namespace Papara.Data.GenericRepository
 
 		public async Task<TEntity?> GetById(long Id)
 		{
-			return await dbContext.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == Id);
+
+			var entityId = await dbContext.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == Id);
+			if (entityId is null)
+				return entityId;
+			return entityId;
 		}
 
 		public async Task Insert(TEntity entity)
@@ -87,21 +92,34 @@ namespace Papara.Data.GenericRepository
 			dbContext.Set<TEntity>().Update(entity);
 		}
 
+		/// <summary>
+		/// Entity gelirse isactive false çekilir ve güncellenir (SoftDelete)
+		/// </summary>
+		/// <param name="entity"></param>
 		public void Delete(TEntity entity)
 		{
-			dbContext.Set<TEntity>().Remove(entity);
+			entity.IsActive = false;
+			Update(entity);
 		}
 
-		public async Task Delete(long Id)
+		/// <summary>
+		///  Id bazlı gelirse isactive false çekilir ve güncellenir (SoftDelete)
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public async Task Delete(long id)
 		{
-			var entity = await dbContext.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == Id);
+			var entity = await dbContext.Set<TEntity>().FirstOrDefaultAsync(x => x.Id == id);
 			if (entity is not null)
-				dbContext.Set<TEntity>().Remove(entity);
+			{
+				entity.IsActive = false;
+				Update(entity);
+			}
 		}
 
 		public async Task<List<TEntity>> GetAll()
 		{
-			return await dbContext.Set<TEntity>().ToListAsync();
+			return await Query().ToListAsync();
 		}
 	}
 }

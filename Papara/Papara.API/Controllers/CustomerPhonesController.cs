@@ -6,6 +6,7 @@ using Papara.Business.Command.CustomerPhoneCommand.Delete;
 using Papara.Business.Command.CustomerPhoneCommand.Update;
 using Papara.Business.Query.CustomerPhoneQuery.GetById;
 using Papara.Business.Query.CustomerPhoneQuery.GetList;
+using Papara.Business.Query.CustomerPhoneQuery.GetListWithInclude;
 using Papara.Schema.CustomerPhoneSchema;
 
 namespace Papara.API.Controllers
@@ -22,13 +23,23 @@ namespace Papara.API.Controllers
 		}
 
 
-		[HttpGet]
-		public async Task<ApiResponse<List<CustomerPhoneResponse>>> Get()
+		[HttpGet("GetListWithDetail")]
+		public async Task<ApiResponse<List<CustomerPhoneResponseWithDetail>>> GetListCustomerPhonesWithDetail()
 		{
-			var operation = new GetAllCustomerPhoneQuery();
+			var operation = new GetListCustomerPhonesWithDetailQuery();
 			var result = await _mediator.Send(operation);
 			return result;
 		}
+
+
+		[HttpGet("GetList")]
+		public async Task<ApiResponse<List<CustomerPhoneResponse>>> GetListCustomerPhones()
+		{
+			var operation = new GetListCustomerPhonesQuery();
+			var result = await _mediator.Send(operation);
+			return result;
+		}
+
 
 		[HttpGet("{customerPhoneId}")]
 		public async Task<ApiResponse<CustomerPhoneResponse>> Get([FromRoute] long customerPhoneId)

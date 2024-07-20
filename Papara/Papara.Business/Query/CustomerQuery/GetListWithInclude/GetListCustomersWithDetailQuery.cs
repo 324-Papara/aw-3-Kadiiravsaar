@@ -27,7 +27,9 @@ namespace Papara.Business.Query.CustomerQuery.GetListWithInclude
 			List<Customer> entityList = await _unitOfWork.CustomerRepository.GetAllInclude(
 		   include: c => c
 			   .Include(c => c.CustomerDetail)
-			   .Include(c => c.CustomerPhones),
+			   .Include(c => c.CustomerPhones)
+			   .Include(c => c.CustomerAddresses),
+
 		   predicate: x => x.IsActive == true // Sadece aktif kayıtları getirmek için predicate
 	   );
 

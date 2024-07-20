@@ -14,7 +14,7 @@ namespace Papara.Base.Response
 		public Guid ReferenceNumber { get; set; } = Guid.NewGuid();
 
 		public ApiResponse(string message = null)
-		{
+		{	
 			if (string.IsNullOrEmpty(message))
 			{
 				IsSuccess = true;
@@ -25,6 +25,7 @@ namespace Papara.Base.Response
 				Message = message;
 			}
 		}
+
 	}
 	public partial class ApiResponse<T>
 	{
@@ -33,7 +34,13 @@ namespace Papara.Base.Response
 		public bool IsSuccess { get; set; }
 		public DateTime ServerDate { get; set; } = DateTime.UtcNow;
 		public Guid ReferenceNumber { get; set; } = Guid.NewGuid();
+		public List<string> Errors { get; set; } = new List<string>();
 
+
+
+		public ApiResponse()
+		{
+		}
 
 		public ApiResponse(T data)
 		{
@@ -55,5 +62,11 @@ namespace Papara.Base.Response
 			Data = default;
 			Message = error;
 		}
+
+		public static ApiResponse<T> Fail(List<string> errors)
+		{
+			return new ApiResponse<T> { Errors = errors };
+		}
+
 	}
 }

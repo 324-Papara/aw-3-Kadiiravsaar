@@ -5,8 +5,6 @@
 		private readonly RequestDelegate _next;  // bir sonraki Middleware'i temsil edecek, geçirecek
 		private readonly ILogger<LoggerMiddleware> _logger;
 
-
-		// burayı iyi araştır
 		public LoggerMiddleware(RequestDelegate next, ILogger<LoggerMiddleware> logger)
 		{
 			_next = next;

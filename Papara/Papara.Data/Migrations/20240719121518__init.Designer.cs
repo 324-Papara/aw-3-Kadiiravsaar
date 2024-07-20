@@ -12,7 +12,7 @@ using Papara.Data.Context;
 namespace Papara.Data.Migrations
 {
     [DbContext(typeof(PaparaDbContext))]
-    [Migration("20240714092435__init")]
+    [Migration("20240719121518__init")]
     partial class _init
     {
         /// <inheritdoc />
@@ -187,7 +187,7 @@ namespace Papara.Data.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("CustomerDetail");
+                    b.ToTable("CustomerDetails");
                 });
 
             modelBuilder.Entity("Papara.Data.Domain.CustomerPhone", b =>

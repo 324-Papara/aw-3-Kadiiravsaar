@@ -1,17 +1,16 @@
-﻿using Papara.Base.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Papara.Schema.CustomerSchema;
 
 namespace Papara.Schema.CustomerPhoneSchema
 {
-	public class CustomerPhoneRequest : BaseRequest
+	public class CustomerPhoneResponseWithDetail
 	{
 		public long CustomerId { get; set; }
 		public string CountryCode { get; set; }
 		public string Phone { get; set; }
 		public bool IsDefault { get; set; }
+
+		public CustomerResponse Customer { get; set; }
+
+
 	}
 }

@@ -184,7 +184,7 @@ namespace Papara.Data.Migrations
                     b.HasIndex("CustomerId")
                         .IsUnique();
 
-                    b.ToTable("CustomerDetail");
+                    b.ToTable("CustomerDetails");
                 });
 
             modelBuilder.Entity("Papara.Data.Domain.CustomerPhone", b =>
